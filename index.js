@@ -19,12 +19,27 @@ dotenv.config();
 const app = express();
 
 // Middleware
+// app.use(
+//   cors({
+//     origin: ["http://localhost:3000", "http://localhost:5173"], // Add your frontend URL
+//     credentials: true,
+//   })
+// );
+// Updated CORS configuration for production
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"], // Add your frontend URL
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:5173", 
+      "https://calibration-tool-server.vercel.app", // Your server URL
+      // "https://your-frontend-app.vercel.app" // Your future frontend URL (replace when you deploy frontend)
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
+
 app.use(express.json());
 
 // Connect to MongoDB

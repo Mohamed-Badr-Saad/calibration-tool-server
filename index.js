@@ -31,8 +31,8 @@ app.use(
     origin: [
       "http://localhost:3000", 
       "http://localhost:5173", 
-      "https://calibration-tool-server.vercel.app", // Your server URL
-      // "https://your-frontend-app.vercel.app" // Your future frontend URL (replace when you deploy frontend)
+      "https://calibration-tool-server.vercel.app", // server URL
+      "https://calibration-tool-five.vercel.app" // frontend URL
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

@@ -33,6 +33,14 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((error) => console.error("❌ MongoDB connection error:", error));
 
+//check for server status
+app.get("/", (req, res) => {
+  res.json({
+    message: "Calibration Tool API is running!",
+    version: "1.0.0",
+  });
+});
+
 // Routes
 app.use("/api/instruments", instrumentsRouter);
 app.use("/api/engineers", engineersRouter);

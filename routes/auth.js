@@ -1,4 +1,3 @@
-// routes/auth.js - COMPLETELY FIXED VERSION
 import express from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -57,6 +56,7 @@ router.post("/login", async (req, res) => {
           name: process.env.SUPER_ADMIN_NAME,
           password: process.env.SUPER_ADMIN_PASSWORD,
           role: "admin",
+          jobTitle: "engineer",
           isActive: true,
         });
         await superAdmin.save();
@@ -77,6 +77,7 @@ router.post("/login", async (req, res) => {
           email: superAdmin.email,
           name: superAdmin.name,
           role: superAdmin.role,
+          jobTitle: superAdmin.jobTitle,
           isActive: superAdmin.isActive,
         },
         token,
@@ -117,6 +118,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        jobTitle: user.jobTitle,
         isActive: user.isActive,
       },
       token,
@@ -137,10 +139,10 @@ router.post("/signup", async (req, res) => {
       name: req.body.name,
     });
 
-    const { email, name, password } = req.body;
+    const { email, name, password, jobTitle } = req.body;
 
     // Input validation
-    if (!email || !name || !password) {
+    if (!email || !name || !password || !jobTitle) {
       console.log("❌ Validation failed: Missing fields");
       return res
         .status(400)
@@ -156,11 +158,9 @@ router.post("/signup", async (req, res) => {
 
     // Prevent creation of super admin email through signup
     if (email.toLowerCase() === process.env.SUPER_ADMIN_EMAIL?.toLowerCase()) {
-      return res
-        .status(400)
-        .json({
-          message: "This email is reserved. Please use a different email.",
-        });
+      return res.status(400).json({
+        message: "This email is reserved. Please use a different email.",
+      });
     }
 
     // Check if user already exists
@@ -180,6 +180,7 @@ router.post("/signup", async (req, res) => {
       name: name.trim(),
       password,
       role: "user",
+      jobTitle: jobTitle,
     });
 
     const savedUser = await user.save();
@@ -192,6 +193,7 @@ router.post("/signup", async (req, res) => {
         email: savedUser.email,
         name: savedUser.name,
         role: savedUser.role,
+        jobTitle: savedUser.jobTitle,
         isActive: savedUser.isActive,
         createdAt: savedUser.createdAt,
       },

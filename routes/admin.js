@@ -70,10 +70,10 @@ router.post("/users", adminAuth, async (req, res) => {
   try {
     console.log("➕ Admin creating user:", req.user.email);
 
-    const { email, name, password, role } = req.body;
+    const { email, name, password, role, jobTitle } = req.body;
 
     // Input validation
-    if (!email || !name || !password || !role) {
+    if (!email || !name || !password || !role || !jobTitle) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -81,6 +81,9 @@ router.post("/users", adminAuth, async (req, res) => {
       return res.status(400).json({ message: "Invalid role" });
     }
 
+    if (!["engineer", "technician"].includes(jobTitle)) {
+      return res.status(400).json({ message: "Invalid job title" });
+    }
     if (password.length < 6) {
       return res
         .status(400)
@@ -108,6 +111,7 @@ router.post("/users", adminAuth, async (req, res) => {
       password,
       role,
       createdBy: req.user._id,
+      jobTitle: jobTitle,
     });
 
     await user.save();
@@ -136,7 +140,7 @@ router.put("/users/:id", adminAuth, async (req, res) => {
     console.log("✏️ Admin updating user:", req.user.email);
 
     const { id } = req.params;
-    const { email, name, password, role } = req.body;
+    const { email, name, password, role, jobTitle } = req.body;
 
     // Find the user first
     const user = await User.findById(id);
@@ -169,6 +173,7 @@ router.put("/users/:id", adminAuth, async (req, res) => {
     if (name) user.name = name.trim();
     if (role && ["admin", "user"].includes(role)) user.role = role;
     if (password && password.length >= 6) user.password = password;
+    if (jobTitle) user.jobTitle = jobTitle;
 
     await user.save();
 

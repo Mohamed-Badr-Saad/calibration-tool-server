@@ -1,8 +1,8 @@
 // index.js - Ensure this is correct
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import { connectDB, requireDB } from "./db.js";
 
 // Import your existing routes
 import instrumentsRouter from "./routes/instruments.js";
@@ -42,9 +42,8 @@ app.use(
 
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
+// Connect to MongoDB during startup and before database-backed routes.
+connectDB()
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((error) => console.error("❌ MongoDB connection error:", error));
 
@@ -57,6 +56,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
+app.use(requireDB);
 app.use("/api/instruments", instrumentsRouter);
 app.use("/api/engineers", engineersRouter);
 app.use("/api/technicians", techniciansRouter);
@@ -81,8 +81,12 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
+  });
+}
+
+export default app;
